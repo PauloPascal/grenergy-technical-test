@@ -1,0 +1,60 @@
+Diagrama técnico de Paulo César Navarrete Pascal, Especialista en Tecnología. Copyright-2026
+
+────────────────────────────────────────────────────────────────────────────┐
+│                         COORDINADOR ELÉCTRICO NACIONAL                     │
+│                                                                            │
+│  API Costos Marginales                API Medidas Operacionales            │
+└───────────────┬─────────────────────────────┬──────────────────────────────┘
+                │                             │
+                │ HTTPS + API KEY             │ HTTPS + API KEY
+                ▼                             ▼
+
+┌────────────────────────────────────────────────────────────────────────────┐
+│                           CAPA DE INTEGRACIÓN                             │
+│                                                                            │
+│                    FASTAPI SECURE SERVICES                                 │
+│                                                                            │
+│   /costo-marginal               /medidas                                   │
+│                                                                            │
+│      Validación Token Interno                                              │
+│      Control de Errores                                                    │
+│      Logging                                                               │
+│      Normalización de Datos                                                │
+└───────────────────────────────┬────────────────────────────────────────────┘
+                                │
+                                │ REST API
+                                ▼
+
+┌────────────────────────────────────────────────────────────────────────────┐
+│                          CAPA DE SEGURIDAD                                │
+│                                                                            │
+│          Internal API Token                                                │
+│          Authentication Layer                                              │
+│          Access Control                                                    │
+│          Audit Trail                                                       │
+└───────────────────────────────┬────────────────────────────────────────────┘
+                                │
+                                ▼
+
+┌────────────────────────────────────────────────────────────────────────────┐
+│                        GRNERGY IT DASHBOARD                               │
+│                                                                            │
+│  Streamlit Enterprise UI                                                   │
+│                                                                            │
+│  ┌────────────────────┐   ┌────────────────────┐                           │
+│  │ Costo Marginal     │   │ Medidas SCADA      │                           │
+│  └────────────────────┘   └────────────────────┘                           │
+│                                                                            │
+│  KPI's                                                                   │
+│  Tendencias                                                              │
+│  Alertas                                                                 │
+│  Visualización Operacional                                               │
+└───────────────────────────────┬────────────────────────────────────────────┘
+                                │
+                                ▼
+
+┌────────────────────────────────────────────────────────────────────────────┐
+│                           USUARIOS DE NEGOCIO                             │
+│                                                                            │
+│    Operaciones      Trading      Energía      Management                  │
+└────────────────────────────────────────────────────────────────────────────┘
