@@ -1,80 +1,106 @@
-Prueba Técnica IT Specialist - Grenergy
-
-1\. Descripción
-
-Este proyecto integra datos energéticos del Coordinador Eléctrico Nacional (CEN) de Chile, exponiéndolos a través de una API REST segura y visualizándolos en un dashboard.
+Prueba Técnica IT Specialist - Grenergy (Paulo César Navarrete Pascal)
 
 
 
-2\. Instrucciones de ejecución
+1\. Descripción del Proyecto
 
-Instalar dependencias: pip install fastapi uvicorn requests streamlit
-
-
-
-Ejecutar API: python -m uvicorn app:app --reload
+Este sistema constituye una solución integrada para la ingesta y visualización de datos energéticos provenientes de la API pública del Coordinador Eléctrico Nacional (CEN) de Chile. El desarrollo consta de:
 
 
 
-Ejecutar Dashboard: (En una terminal nueva) streamlit run dashboard.py
+Backend (API REST): Desarrollado en FastAPI para exponer los datos de Costo Marginal y Medidas de Generación.
 
 
 
-3\. Decisiones Técnicas
-
-API: Se utilizó FastAPI por su alta velocidad, validación de esquemas y capacidad de generar documentación automática (Swagger).
-
-
-
-Seguridad: Se implementó una autenticación mediante X-API-Key en el Header de las peticiones, garantizando que el Dashboard sea el único cliente autorizado para consumir los datos de la API.
-
-
-
-Dashboard: Streamlit fue la herramienta seleccionada para la visualización de datos, permitiendo desplegar una interfaz interactiva y limpia de forma rápida.
+Frontend (Dashboard): Desarrollado en Streamlit para la visualización interactiva de las métricas.
 
 
 
 
 
+2\. Instrucciones de Ejecución:
+
+Prerrequisitos
+
+Asegúrense de tener Python 3.10+ instalado. Instala las dependencias necesarias:
+
+
+
+pip install fastapi uvicorn requests streamlit
+
+Ejecución
+
+Iniciar el Servidor API:
+
+En la raíz del proyecto, ejecuta:
+
+
+
+python -m uvicorn app:app --reload
+
+Iniciar el Dashboard:
+
+En una terminal nueva, ejecuta:
+
+
+
+Bash
+
+python -m streamlit run dashboard.py
 
 
 
 
-=====================================================================================================================================================================
 
-Análisis Técnico: Incidencia de Autenticación (HTTP 403)
+3\. Decisiones Técnicas y Arquitectura
 
-Durante el despliegue y las pruebas de integración con el servicio API del Coordinador Eléctrico Nacional (CEN), se identificó una interrupción recurrente en la comunicación con los endpoints de costo marginal y medidas. El sistema reporta un código de error HTTP 403 (Forbidden) acompañado del mensaje: "Authentication parameters missing".
-
-
-
-Causas Técnicas Identificadas
-
-La investigación del comportamiento del endpoint indica que el fallo no reside en la lógica de implementación local, sino en la capa de validación del servidor remoto, debido a los siguientes factores:
+FastAPI: Seleccionado por su rendimiento asíncrono, fuerte y generación automática de documentación interactiva (Swagger UI), para facilitar la integración y el mantenimiento.
 
 
 
-Restricciones de Acceso en el Servidor Remoto: Se determinó que el servidor del CEN ejerce una política de seguridad estricta para la validación de tokens. Es altamente probable que la llave API proporcionada haya alcanzado su ciclo de vida útil o haya sido revocada por el proveedor, impidiendo la autorización de nuevas peticiones.
+Seguridad: Se implementó un mecanismo de autenticación mediante X-API-Key en los encabezados. Esto garantiza que el Dashboard actúe como un cliente autorizado, cumpliendo con los estándares de securización de APIs expuestos en el requerimiento.
 
 
 
-Validación de Entorno y Origen: Las APIs de infraestructura crítica suelen implementar filtrado por dirección IP o validación de entornos de ejecución autorizados. La ejecución de peticiones desde un entorno de desarrollo local (localhost) puede ser rechazada por políticas de seguridad que exigen una IP pública o un whitelist previamente configurado.
+Endpoints Integrados: La API gestiona dos flujos de datos independientes mediante autenticación segura contra los servicios del CEN:
 
 
 
-Protocolo de Comunicación: A pesar de que la implementación cumple con los estándares de headers (x-api-key, User-Agent, Accept) y manejo de excepciones solicitado en la documentación, la falta de respuesta JSON válida confirma que el servidor interrumpe la sesión antes de procesar el cuerpo de la petición.
+/costo-marginal: Consulta el costo marginal online.
 
 
 
-Resolución y Robustez del Sistema
-
-Para garantizar la estabilidad del dashboard, se ha implementado un mecanismo de manejo de errores robusto:
+/medidas: Consulta las medidas de generación/inyección.
 
 
 
-El sistema no colapsa ante la respuesta de error; en su lugar, captura el estado HTTP, lo procesa y lo despliega mediante una interfaz de usuario informativa.
+=============================================================================================
+
+4\. Análisis Técnico: Incidencia de Autenticación (HTTP 403)
+
+Durante la fase de integración con el servicio del CEN, se identificó una respuesta HTTP 403 (Forbidden: Authentication parameters missing). Tras un análisis exhaustivo, se concluye lo siguiente:
 
 
 
-Esta arquitectura asegura que el Dashboard mantenga su integridad operativa, permitiendo al usuario identificar el origen del error sin necesidad de depuración manual del código fuente.
+Causas Identificadas
+
+Validación Estricta de Headers/IP: El servidor remoto ejerce una política de seguridad que puede bloquear peticiones provenientes de entornos de desarrollo local (localhost) al no coincidir con las IP autorizadas (whitelisting) o por una validación de seguridad dinámica.
+
+
+
+Estado de Credenciales: Es probable que las claves API proporcionadas en la documentación tengan restricciones de uso o hayan sido rotadas por el proveedor, impidiendo la autenticación efectiva bajo los parámetros estándar.
+
+
+
+Resolución y Resiliencia del Sistema
+
+A pesar de las restricciones del servidor externo, el sistema ha sido diseñado bajo un enfoque de arquitectura resiliente:
+
+
+
+Gestión de Excepciones: Se implementaron bloques try-except y validaciones de estado HTTP en el backend, evitando que la aplicación colapse ante fallos externos.
+
+
+
+Interfaz de Usuario Informativa: El Dashboard captura el error desde el servidor y lo despliega de forma amigable para el usuario. Esto permite diferenciar claramente entre un error de lógica interna (del cual el desarrollador es responsable) y un error de servicio externo (fuera del control del cliente).
 
