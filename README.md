@@ -44,8 +44,6 @@ En una terminal nueva, ejecuta:
 
 
 
-Bash
-
 python -m streamlit run dashboard.py
 
 
